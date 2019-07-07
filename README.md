@@ -24,8 +24,18 @@ Example config:
               {
                 "ip_address": "10.0.1.25",
                 "version": "v6",
-                "lights": {"fullColor": ["Kitchen",null,"Bedroom","Hallway"],
-                           "rgbw": ["Living Room", "Downstairs Bedroom"]},
+                "lights": {
+                    "fullColor": [
+                        {"name": "Kitchen", "relay": {"ip": "192.168.0.14", "password": "sec", "channel": "10"}},
+                        {"name": null, "relay": {"ip": "192.168.0.14", "password": "sec", "channel": "10"}},
+                        {"name": "Bedroom", "relay": {"ip": "192.168.0.14", "password": "sec", "channel": "10"}},
+                        {"name": "Hallway", "relay": {"ip": "192.168.0.14", "password": "sec", "channel": "10"}}
+                    ],
+                    "rgbw": [
+                        {"name": "Living Room"},
+                        {"name": "Downstairs Bedroom"},
+                    ]
+                },
                 "repeat": 1,
                 "delay": 100
               },

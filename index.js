@@ -1,6 +1,7 @@
 var Milight = require("node-milight-promise").MilightController;
 var helper = require("node-milight-promise").helper;
 var inherits = require('util').inherits;
+import Relay from './relay';
 
 "use strict";
 
@@ -109,18 +110,18 @@ MiLightPlatform.prototype.accessories = function(callback) {
 
               // Create bulb accessories for all of the defined zones
               for (var i = 0; i < zonesLength; i++) {
-                var bulbConfig = {};
-                if (bulbConfig.name = bridgeConfig.lights[lightType][i]) {
+                let bulbConfig = bridgeConfig.lights[lightType][i];
+                try {
                   if (lightType === "fullColor" && bridgeConfig.use8Zone === true) {
                     bulbConfig.type = "fullColor8Zone";
                   } else {
                     bulbConfig.type = lightType;
                   }
                   bulbConfig.zone = i + 1;
-                  var bulb = new MiLightAccessory(bulbConfig, bridgeControllers[bridgeConfig.host], this.log);
+                  let bulb = new MiLightAccessory(bulbConfig, bridgeControllers[bridgeConfig.host], this.log);
                   foundBulbs.push(bulb);
-                } else if (bridgeConfig.lights[lightType][i] !== null) {
-                  this.log.error("Unable to add light from '%s' array, index %d", lightType, i);
+                } catch (e) {
+                  this.log.error(`Unable to add light from '${lightType}' array, index ${i}, error: ${e}`);
                 }
               }
             }
@@ -155,6 +156,19 @@ function MiLightAccessory(bulbConfig, bridgeController, log) {
   this.name = bulbConfig.name;
   this.zone = bulbConfig.zone;
   this.type = bulbConfig.type;
+  if (bulbConfig.relay) {
+    let relay = Relay(bulbConfig.relay.ip, bulbConfig.relay.password, bulbConfig.relay.channel);
+    this.ralay = relay;
+    setInterval(function() {
+      relay.isPowerOn().then((powerOnState) => {
+        if (typeof powerOnState === 'boolean') {
+          this.lightbulbService.setCharacteristic(Characteristic.On, powerOnState);
+        } else {
+          console.error(`Bad power state: ${powerOnState}`)
+        }
+      })
+    }, 3000);
+  }
 
   // have to keep track of the last values we set brightness and colour temp to for rgb/white bulbs
   this.brightness = -1;
@@ -189,6 +203,7 @@ MiLightAccessory.prototype.setPowerState = function(powerOn, callback) {
     this.lastSent.bulb = null;
     this.light.sendCommands(this.commands[this.type].off(this.zone));
   }
+  if (this.ralay) {this.relay.sendCommand(powerOn ? 1 : 0)}
   callback(null);
 };
 
@@ -330,7 +345,7 @@ MiLightAccessory.prototype.setColorTemperature = function(value, callback) {
     this.log("[" + this.name + "] Setting color temperature to %sK", Math.round(1000000 / value));
 
     // There are only 100 steps of color temperature for fullColor bulbs, so let's convert from megakelvin to a value from 0-100
-    miLightValue = this.mkToMilight(value, 100);
+    let miLightValue = this.mkToMilight(value, 100);
 
     this.log.debug("[" + this.name + "] Setting bulb color temperature to internal value %s", miLightValue);
 
