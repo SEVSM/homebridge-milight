@@ -13,12 +13,12 @@ class Relay {
   }
 
   async sendCommand(cmd) {
-    let params = `?cmd=${this.channel}:${cmd}`;
+    let params = `cmd=${this.channel}:${cmd}`;
     return await this.makeRequest(params);
   }
 
   async getState() {
-    let params = `?pt=${this.channel}&cmd=get`;
+    let params = `pt=${this.channel}&cmd=get`;
     return await this.makeRequest(params);
   }
 
