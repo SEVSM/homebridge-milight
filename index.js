@@ -1,7 +1,7 @@
 var Milight = require("node-milight-promise").MilightController;
 var helper = require("node-milight-promise").helper;
 var inherits = require('util').inherits;
-import Relay from './relay';
+var Relay = require("./relay");
 
 "use strict";
 
