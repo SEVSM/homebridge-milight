@@ -26,8 +26,8 @@ Example config:
                 "version": "v6",
                 "lights": {
                     "fullColor": [
-                        {"name": "Kitchen", "relay": {"ip": "192.168.0.14", "password": "sec", "channel": "10"}},
-                        {"name": null, "relay": {"ip": "192.168.0.14", "password": "sec", "channel": "10"}},
+                        {"name": "Kitchen", "relay": {"ip": "192.168.0.14", "password": "sec", "channel": "10", "powerOnTimeout": 2000}},
+                        {"name": null, "relay": {"ip": "192.168.0.14", "password": "sec", "channel": "10", "powerOnTimeout": 5000}},
                         {"name": "Bedroom", "relay": {"ip": "192.168.0.14", "password": "sec", "channel": "10"}},
                         {"name": "Hallway", "relay": {"ip": "192.168.0.14", "password": "sec", "channel": "10"}}
                     ],
