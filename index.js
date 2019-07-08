@@ -157,7 +157,7 @@ function MiLightAccessory(bulbConfig, bridgeController, log) {
   this.zone = bulbConfig.zone;
   this.type = bulbConfig.type;
   if (bulbConfig.relay) {
-    let relay = Relay(bulbConfig.relay.ip, bulbConfig.relay.password, bulbConfig.relay.channel);
+    let relay = new Relay(bulbConfig.relay.ip, bulbConfig.relay.password, bulbConfig.relay.channel);
     this.ralay = relay;
     setInterval(function() {
       relay.isPowerOn().then((powerOnState) => {
