@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 
-export default class Relay {
+class Relay {
   constructor(ip, password, channel) {
     this.ip = ip;
     this.password = password;
@@ -43,3 +43,5 @@ export default class Relay {
     }
   }
 }
+
+module.exports = Relay;
