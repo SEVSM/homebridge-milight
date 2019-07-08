@@ -157,14 +157,14 @@ function MiLightAccessory(bulbConfig, bridgeController, log) {
   this.zone = bulbConfig.zone;
   this.type = bulbConfig.type;
   if (bulbConfig.relay) {
-    let relay = new Relay(bulbConfig.relay.ip, bulbConfig.relay.password, bulbConfig.relay.channel);
-    this.ralay = relay;
-    setInterval(function() {
-      relay.isPowerOn().then((powerOnState) => {
+    this.relay = new Relay(bulbConfig.relay.ip, bulbConfig.relay.password, bulbConfig.relay.channel);
+    setInterval(() => {
+      this.relay.isPowerOn().then((powerOnState) => {
         if (typeof powerOnState === 'boolean') {
+          log(`powerOnState: ${powerOnState}`);
           this.lightbulbService.setCharacteristic(Characteristic.On, powerOnState);
         } else {
-          console.error(`Bad power state: ${powerOnState}`)
+          log(`Bad power state: ${powerOnState}`);
         }
       })
     }, 3000);
@@ -203,7 +203,7 @@ MiLightAccessory.prototype.setPowerState = function(powerOn, callback) {
     this.lastSent.bulb = null;
     this.light.sendCommands(this.commands[this.type].off(this.zone));
   }
-  if (this.ralay) {this.relay.sendCommand(powerOn ? 1 : 0)}
+  if (typeof this.relay !== 'undefined') {this.relay.sendCommand(powerOn ? 1 : 0)}
   callback(null);
 };
 
