@@ -23,7 +23,7 @@ class Relay {
   }
 
   async isPowerOn() {
-    const response = this.getState();
+    const response = await this.getState();
     switch (response.data) {
       case 'ON':
         return true;
