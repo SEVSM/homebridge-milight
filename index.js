@@ -207,11 +207,16 @@ MiLightAccessory.prototype.setPowerState = function(powerOn, callback) {
   }
   if (typeof this.relay !== 'undefined') {
     this.relay.sendCommand(powerOn ? 1 : 0).then((res) => {
-      setTimeout(callback, this.powerOnTimeout, null)
+      if (powerOn) {
+        setTimeout(() => {
+          this.lightbulbService.getCharacteristic(Characteristic.Brightness).setValue(this.lightbulbService.getCharacteristic(Characteristic.Brightness).value, null);
+          this.lightbulbService.getCharacteristic(Characteristic.Hue).setValue(this.lightbulbService.getCharacteristic(Characteristic.Hue).value, null, 'internal');
+        }, this.powerOnTimeout)
+      }
     })
-  } else {
-    callback(null);
   }
+
+  callback(null);
 };
 
 MiLightAccessory.prototype.setBrightness = function(level, callback) {
