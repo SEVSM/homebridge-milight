@@ -164,7 +164,9 @@ function MiLightAccessory(bulbConfig, bridgeController, log) {
       this.relay.isPowerOn().then((powerOnState) => {
         if (typeof powerOnState === 'boolean') {
           this.log.debug(`powerOnState: ${powerOnState}`);
-          this.lightbulbService.setCharacteristic(Characteristic.On, powerOnState);
+          if (this.lastPowerOn !== powerOnState) {
+            this.lightbulbService.setCharacteristic(Characteristic.On, powerOnState);
+          }
         } else {
           this.log.error(`Bad power state: ${powerOnState}`);
         }
@@ -189,9 +191,13 @@ function MiLightAccessory(bulbConfig, bridgeController, log) {
   // keep track of the last bulb an 'on' command was sent to
   this.lastSent = this.light.lastSent;
 
+  // keep tracking last 'on' state
+  this.lastPowerOn = true;
+
 }
 
 MiLightAccessory.prototype.setPowerState = function(powerOn, callback) {
+  let powerOnIsChanged = this.lastPowerOn !== powerOn;
   if (powerOn) {
     if (this.lastSent.bulb === this.type + this.zone) {
       this.log.debug("[" + this.name + "] Omitting 'on' command as we've sent it to this bulb most recently");
@@ -207,15 +213,17 @@ MiLightAccessory.prototype.setPowerState = function(powerOn, callback) {
   }
   if (typeof this.relay !== 'undefined') {
     this.relay.sendCommand(powerOn ? 1 : 0).then((res) => {
-      if (powerOn) {
+      let currentBrightness = this.lightbulbService.getCharacteristic(Characteristic.Brightness).value;
+      if (powerOn && powerOnIsChanged && currentBrightness) {
         setTimeout(() => {
-          this.lightbulbService.getCharacteristic(Characteristic.Brightness).setValue(this.lightbulbService.getCharacteristic(Characteristic.Brightness).value, null);
+          this.lightbulbService.getCharacteristic(Characteristic.Brightness).setValue(currentBrightness, null);
           this.lightbulbService.getCharacteristic(Characteristic.Hue).setValue(this.lightbulbService.getCharacteristic(Characteristic.Hue).value, null, 'internal');
         }, this.powerOnTimeout)
       }
     })
   }
 
+  this.lastPowerOn = powerOn;
   callback(null);
 };
 
