@@ -157,6 +157,7 @@ function MiLightAccessory(bulbConfig, bridgeController, log) {
   this.zone = bulbConfig.zone;
   this.type = bulbConfig.type;
   this.powerOnTimeout = bulbConfig.powerOnTimeout || 3000;
+  this.powerOnTimer = null;
 
   if (bulbConfig.relay) {
     this.relay = new Relay(bulbConfig.relay.ip, bulbConfig.relay.password, bulbConfig.relay.channel);
@@ -210,12 +211,16 @@ MiLightAccessory.prototype.setPowerState = function(powerOn, callback) {
     this.log("[" + this.name + "] Setting power state to off");
     this.lastSent.bulb = null;
     this.light.sendCommands(this.commands[this.type].off(this.zone));
+    if (this.powerOnTimer) {
+      clearTimeout(this.powerOnTimer);
+      this.powerOnTimer = null;
+    }
   }
   if (typeof this.relay !== 'undefined') {
     this.relay.sendCommand(powerOn ? 1 : 0).then((res) => {
       let currentBrightness = this.lightbulbService.getCharacteristic(Characteristic.Brightness).value;
       if (powerOn && powerOnIsChanged && currentBrightness) {
-        setTimeout(() => {
+        this.powerOnTimer = setTimeout(() => {
           this.lightbulbService.getCharacteristic(Characteristic.Brightness).setValue(currentBrightness, null);
           this.lightbulbService.getCharacteristic(Characteristic.Hue).setValue(this.lightbulbService.getCharacteristic(Characteristic.Hue).value, null, 'internal');
         }, this.powerOnTimeout)
