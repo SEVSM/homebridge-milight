@@ -15,6 +15,9 @@
   "keywords": [
     "homebridge-plugin"
   ],
+  "engines": {
+    "homebridge": ">=0.4.1"
+  },
   "peerDepdendencies": {
     "homebridge": ">=0.4.27"
   },
