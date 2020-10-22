@@ -1,5 +1,5 @@
 {
-  "name": "homebridge-milight",
+  "name": "homebridge-milight-relay",
   "version": "1.1.4",
   "description": "MiLight/LimitlessLED/Easybulb Plugin for Homebridge: https://github.com/nfarina/homebridge",
   "author": "Sam Edwards <sam@samedwards.ca> (https://samedwards.ca/)",
